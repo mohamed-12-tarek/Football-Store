@@ -1,0 +1,448 @@
+# ==============================================
+# FOOTBALL STORE - PROFESSIONAL .GITIGNORE
+# ==============================================
+# Python / Flask / SQL Server Stack
+# Generated for Football Store E-Commerce Platform
+# ==============================================
+
+# ==============================================
+# PYTHON
+# ==============================================
+
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*$py.class
+*.c
+*.o
+*.so
+
+# C extensions
+*.egg-info/
+dist/
+build/
+eggs/
+*.egg
+
+# PyInstaller
+*.manifest
+*.spec
+
+# Installer logs
+pip-log.txt
+pip-delete-this-directory.txt
+
+# Unit test / coverage reports
+htmlcov/
+.tox/
+.nox/
+.coverage
+.coverage.*
+.cache
+nosetests.xml
+coverage.xml
+*.cover
+*.py,cover
+.hypothesis/
+.pytest_cache/
+
+# Translations
+*.mo
+*.pot
+
+# Django stuff
+*.log
+local_settings.py
+db.sqlite3
+
+# Flask stuff
+instance/
+.webassets-cache
+
+# Scrapy stuff
+.scrapy
+
+# Sphinx documentation
+docs/_build/
+
+# PyBuilder
+target/
+
+# Jupyter Notebook
+.ipynb_checkpoints
+
+# IPython
+profile_default/
+ipython_config.py
+
+# pyenv
+.python-version
+
+# celery beat schedule file
+celerybeat-schedule
+
+# SageMath parsed files
+*.sage.py
+
+# Environments
+.env
+.env.local
+.env.*.local
+.env.example
+venv/
+env/
+.venv/
+ENV/
+env.bak/
+venv.bak/
+
+# Spyder project settings
+.spyderproject
+.spyproject
+
+# Rope project settings
+.ropeproject
+
+# mkdocs documentation
+/site
+
+# mypy
+.mypy_cache/
+.dmypy.json
+dmypy.json
+
+# Pyre type checker
+.pyre/
+
+
+# ==============================================
+# FLASK SPECIFIC
+# ==============================================
+
+# Instance folder
+instance/
+
+# Flask session files
+flask_session/
+
+# Uploaded files
+static/uploads/products/*
+!static/uploads/products/.gitkeep
+
+# Debug mode
+*.pyc.ORIGINAL
+
+
+# ==============================================
+# DATABASE & SQL
+# ==============================================
+
+# SQL Server backup files
+*.bak
+*.ldf
+*.mdf
+*.ndf
+
+# Database dumps
+*.sql
+!db_scripts/*.sql
+
+# SQLite (if used)
+*.db
+*.sqlite
+*.sqlite3
+
+
+# ==============================================
+# IDE / EDITOR FILES
+# ==============================================
+
+# VS Code
+.vscode/
+*.code-workspace
+settings.json
+
+# JetBrains IDEs
+.idea/
+*.ipr
+*.iws
+.idea_modules/
+
+# PyCharm
+*.iml
+
+# IntelliJ
+*.idea
+
+# WebStorm
+*.sublime-*
+
+# Vim
+*.swp
+*.swo
+*~
+.vscode/
+
+# EMACS
+*~
+
+
+# ==============================================
+# OPERATING SYSTEM FILES
+# ==============================================
+
+# macOS
+.DS_Store
+.AppleDouble
+.LSOverride
+._*
+
+# Thumbnails
+.DS_Store?
+._*
+
+# Files with ._ prefix (Apple Double files)
+Icon?
+ Icon\r
+._*
+
+# Source executables
+(.)?
+
+# Temporary files
+._*
+
+# macOS Safari
+Cached*.protocolli
+
+# Windows
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+$RECYCLE.BIN/
+
+# Linux
+*~
+.fuse_hidden*
+.directory
+.Trash-*
+.nfs*
+
+
+# ==============================================
+# LOGS & CACHE
+# ==============================================
+
+# Log files
+*.log
+logs/
+access.log
+error.log
+app.log
+
+# Pipeline logs
+*.log.*
+
+# Apache/Nginx logs
+access_log*
+error_log*
+
+# Crash logs
+crash.log
+
+# Temp files
+*.tmp
+*.temp
+*.swp
+*.swo
+
+# Cache files
+.cache/
+*.cache
+__pycache__/
+
+
+# ==============================================
+# SECRETS & CREDENTIALS
+# ==============================================
+
+# Environment files (NEVER commit these)
+.env
+.env.local
+.env.*.local
+.env.development
+.env.production
+.env.staging
+.env.test
+
+# API keys and secrets
+*.pem
+*.key
+*.crt
+*.csr
+
+# SSH keys
+*.pem
+id_rsa*
+id_ecdsa*
+id_ed25519*
+
+# GPG keys
+*.gpg
+*.gpg~
+
+# Configuration with secrets
+config_local.py
+secrets.py
+credentials.py
+
+
+# ==============================================
+# DOCKER & CONTAINERS
+# ==============================================
+
+# Docker
+.docker/
+
+# Docker Compose
+docker-compose.override.yml
+
+# Docker volumes
+*.vol
+
+
+# ==============================================
+# STATIC ASSETS & BUILDS
+# ==============================================
+
+# Compiled / minified assets
+*.min.css
+*.min.js
+*.bundle.js
+*.bundle.css
+
+# Generated assets
+public/
+dist/
+build/
+
+# Node modules (if applicable)
+node_modules/
+package-lock.json
+yarn.lock
+
+# npm debug logs
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Yarn
+.yarn-integrity
+
+# Build outputs
+out/
+generated/
+
+
+# ==============================================
+# DEPLOYMENT & SERVER
+# ==============================================
+
+# Deployment scripts
+deploy/
+deployment/
+*.sh
+*.bat
+*.ps1
+
+# Server configs
+nginx.conf
+apache.conf
+*.conf.backup
+
+# Cloud credentials
+*.aws/
+.gcloud/
+service-account.json
+
+
+# ==============================================
+# TESTING & COVERAGE
+# ==============================================
+
+# Test results
+test-results/
+test-reports/
+.nyc_output/
+
+# Jest coverage
+coverage/
+lcov.info
+
+# PHPUnit
+.phpunit.result.cache
+
+
+# ==============================================
+# VIRTUAL ENVIRONMENTS (Common names)
+# ==============================================
+
+venv/
+venv_project/
+env/
+.env/
+virtualenv/
+.venv/
+pyvenv/
+.venv*/
+
+
+# ==============================================
+# EXTERNAL LIBS (if any)
+# ==============================================
+
+lib/
+libs/
+vendor/
+third_party/
+
+
+# ==============================================
+# MISCELLANEOUS
+# ==============================================
+
+# Backup files
+*.backup
+*.backup.*
+*~
+\#*
+.\#*
+
+# Merge files
+*.orig
+
+# Package manager locks
+package-lock.json
+yarn.lock
+pip-lock.txt
+poetry.lock
+
+# GitHub
+.github/
+
+# Static placeholder
+static/images/placeholder.png
+
+
+# ==============================================
+# SECURITY SCANNING
+# ==============================================
+
+# Bandit
+.bandit
+
+# Safety
+safety.txt
+
+# Dependency scanning
+*.scan

@@ -1,0 +1,286 @@
+{% extends "layout.html" %} {% block title %}Checkout - Football Store{%
+endblock %} {% block content %}
+<section class="page-header">
+  <div class="container">
+    <h1>Checkout</h1>
+  </div>
+</section>
+
+<section class="section">
+  <div class="container">
+    <div class="checkout-layout">
+      <div class="checkout-form">
+        <h2>Shipping Information</h2>
+        <form id="checkoutForm">
+          <div class="form-group">
+            <label for="address">Address</label>
+            <input
+              type="text"
+              id="address"
+              name="address"
+              required
+              class="form-input"
+            />
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label for="city">City</label>
+              <input
+                type="text"
+                id="city"
+                name="city"
+                required
+                class="form-input"
+              />
+            </div>
+            <div class="form-group">
+              <label for="country">Country</label>
+              <input
+                type="text"
+                id="country"
+                name="country"
+                required
+                class="form-input"
+              />
+            </div>
+          </div>
+
+          <h2>Payment Information</h2>
+          <div class="form-group">
+            <label for="card_number">Card Number</label>
+            <input
+              type="text"
+              id="card_number"
+              name="card_number"
+              placeholder="1234 5678 9012 3456"
+              pattern="\d{16}"
+              maxlength="16"
+              class="form-input"
+            />
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label for="expiry">Expiry Date</label>
+              <input
+                type="text"
+                id="expiry"
+                name="expiry"
+                placeholder="MM/YY"
+                pattern="\d{2}/\d{2}"
+                maxlength="5"
+                class="form-input"
+              />
+            </div>
+            <div class="form-group">
+              <label for="cvv">CVV</label>
+              <input
+                type="text"
+                id="cvv"
+                name="cvv"
+                placeholder="123"
+                pattern="\d{3,4}"
+                maxlength="4"
+                class="form-input"
+              />
+            </div>
+          </div>
+          <p class="text-muted" style="font-size: 0.85rem; color: #6c757d;">
+            <i class="fas fa-lock"></i> Payment integration coming soon. Currently processing Cash on Delivery.
+          </p>
+          <div class="form-row">
+            <div class="form-group">
+              <label for="expiry">Expiry Date</label>
+              <input
+                type="text"
+                id="expiry"
+                placeholder="MM/YY"
+                required
+                class="form-input"
+              />
+            </div>
+            <div class="form-group">
+              <label for="cvv">CVV</label>
+              <input
+                type="text"
+                id="cvv"
+                placeholder="123"
+                required
+                class="form-input"
+              />
+            </div>
+          </div>
+        </form>
+      </div>
+
+      <div class="checkout-summary">
+        <h3>Order Summary</h3>
+        {% for item in cart.values() %}
+        <div class="checkout-item">
+          <span>{{ item.name }} (x{{ item.quantity }})</span>
+          <span class="price-amount"
+                data-price-base="{{ (item.price * item.quantity)|float }}"
+                data-price-currency="{{ item.currency_code or base_currency.code }}">
+            {{ format_currency_price(item.price * item.quantity, None, item.currency_code) }}
+          </span>
+        </div>
+        {% endfor %}
+        
+        <div class="summary-row" style="margin-top: 15px; padding-top: 15px; border-top: 1px solid #eee;">
+          <span>Subtotal</span>
+          <span class="price-amount"
+                data-price-base="{{ subtotal_base }}"
+                data-price-currency="{{ base_currency.code }}">
+            {{ subtotal_formatted }}
+          </span>
+        </div>
+        
+        <div class="coupon-section" style="margin: 15px 0; padding: 15px; background: #f8f9fa; border-radius: 8px;">
+          <h4 style="margin-bottom: 10px; font-size: 14px;">
+            <i class="fas fa-ticket-alt"></i> Coupon Code
+          </h4>
+          {% if coupon %}
+          <div style="padding: 10px; background: #d4edda; border-radius: 4px; color: #155724; margin-bottom: 10px;">
+            <strong>Applied:</strong> {{ coupon.code }}
+            <button onclick="removeCoupon()" style="margin-left: 10px; background: #dc3545; color: white; border: none; padding: 5px 10px; border-radius: 4px; cursor: pointer; font-size: 12px;">
+              Remove
+            </button>
+          </div>
+          {% else %}
+          <div style="display: flex; gap: 10px;">
+            <input
+              type="text"
+              id="couponCode"
+              placeholder="Enter coupon code"
+              style="flex: 1; padding: 8px; border: 1px solid #ddd; border-radius: 4px; font-size: 14px;"
+            />
+            <button
+              class="btn btn-secondary"
+              onclick="applyCoupon()"
+              style="padding: 8px 15px; font-size: 14px;"
+            >
+              Apply
+            </button>
+          </div>
+          {% endif %}
+          <div id="couponMessage" style="margin-top: 10px; font-size: 12px;"></div>
+        </div>
+        
+        {% if discount_base > 0 %}
+        <div class="summary-row" style="color: #28a745;">
+          <span>Discount</span>
+          <span class="price-amount"
+                data-price-base="{{ discount_base }}"
+                data-price-currency="{{ base_currency.code }}"
+                data-price-negative="true">
+            -{{ discount_formatted }}
+          </span>
+        </div>
+        {% endif %}
+        
+        <div class="summary-row">
+          <span>Shipping</span>
+          <span class="price-amount"
+                data-price-base="{{ shipping_base }}"
+                data-price-currency="{{ base_currency.code }}">
+            {{ shipping_formatted }}
+          </span>
+        </div>
+        <div class="summary-row">
+          <span>Tax</span>
+          <span class="price-amount"
+                data-price-base="{{ tax_base }}"
+                data-price-currency="{{ base_currency.code }}">
+            {{ tax_formatted }}
+          </span>
+        </div>
+        <div class="summary-total">
+          <span>Total</span>
+          <span id="finalTotal"
+                class="price-amount"
+                data-price-base="{{ total_base }}"
+                data-price-currency="{{ base_currency.code }}">
+            {{ total_formatted }}
+          </span>
+        </div>
+        <button class="btn btn-primary btn-block" onclick="placeOrder()">
+          <i class="fas fa-lock"></i> Place Order
+        </button>
+      </div>
+    </div>
+  </div>
+</section>
+{% endblock %} {% block scripts %}
+<script>
+  function placeOrder() {
+    const form = document.getElementById("checkoutForm");
+
+    const address = document.getElementById("address").value;
+    const city = document.getElementById("city").value;
+    const country = document.getElementById("country").value;
+
+    if (!address || !city || !country) {
+      alert("Please fill in all shipping details");
+      return;
+    }
+
+    const formData = new FormData(form);
+
+    fetch("/place-order", {
+      method: "POST",
+      body: formData,
+    })
+      .then((response) => response.json())
+      .then((data) => {
+        if (data.success) {
+          alert(
+            `Order placed successfully! Order number: ${data.order_number}`
+          );
+          window.location.href = "/";
+        } else {
+          alert("Error: " + data.message);
+        }
+      });
+  }
+
+  function applyCoupon() {
+    const code = document.getElementById('couponCode').value.trim();
+    const messageDiv = document.getElementById('couponMessage');
+    
+    if (!code) {
+      messageDiv.innerHTML = '<span style="color: #dc3545;">Please enter a coupon code</span>';
+      return;
+    }
+
+    fetch('/apply-coupon', {
+      method: 'POST',
+      headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify({code: code})
+    })
+    .then(response => response.json())
+    .then(data => {
+      if (data.success) {
+        messageDiv.innerHTML = `<span style="color: #28a745;">${data.message}</span>`;
+        setTimeout(() => location.reload(), 1000);
+      } else {
+        messageDiv.innerHTML = `<span style="color: #dc3545;">${data.message}</span>`;
+      }
+    })
+    .catch(error => {
+      messageDiv.innerHTML = '<span style="color: #dc3545;">Error applying coupon</span>';
+    });
+  }
+
+  function removeCoupon() {
+    fetch('/remove-coupon', {
+      method: 'POST',
+      headers: {'Content-Type': 'application/json'}
+    })
+    .then(response => response.json())
+    .then(data => {
+      if (data.success) {
+        location.reload();
+      }
+    });
+  }
+</script>
+{% endblock %}

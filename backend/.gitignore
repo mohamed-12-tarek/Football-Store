@@ -1,0 +1,42 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+venv/
+venv_project/
+env/
+.venv
+
+# Flask
+instance/
+.webassets-cache
+*.log
+
+# Environment
+.env
+.env.local
+.env.*.local
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Database
+*.mdf
+*.ldf
+*.db
+
+# Byte-compiled
+*.pyc
+
+# Templates (frontend repo)
+templates/
+static/

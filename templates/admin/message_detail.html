@@ -1,0 +1,62 @@
+{% extends "layout.html" %}
+{% block title %}Message #{{ message.message_id }} - Admin{% endblock %}
+
+{% block content %}
+<section class="page-header">
+  <div class="container">
+    <h1>Message #{{ message.message_id }}</h1>
+    <p>Respond directly to {{ message.name }} ({{ message.email }})</p>
+  </div>
+</section>
+
+<section class="section">
+  <div class="container">
+    <div class="admin-section">
+      <a href="{{ url_for('contact_bp.admin_messages') }}" class="btn btn-secondary">&larr; Back to messages</a>
+      <div class="message-detail">
+        <div class="message-meta">
+          <div>
+            <strong>From:</strong> {{ message.name }} &middot; {{ message.email }}
+          </div>
+          <div>
+            <strong>Subject:</strong> {{ message.subject }}
+          </div>
+          <div>
+            <strong>Submitted:</strong> {{ message.created_at.strftime('%Y-%m-%d %H:%M') }}
+          </div>
+          <div>
+            <span class="status-badge status-{{ message.status|lower }}">{{ message.status }}</span>
+          </div>
+        </div>
+        <div class="message-body">
+          <h3>Message</h3>
+          <p>{{ message.message }}</p>
+        </div>
+      </div>
+
+      <div class="response-form">
+        <h3>Response</h3>
+        <form method="POST">
+          <div class="form-group">
+            <label for="response">Write a reply</label>
+            <textarea id="response" name="response" rows="5" required>{{ message.response or '' }}</textarea>
+          </div>
+          <div class="form-group">
+            <label for="status">Status</label>
+            <select id="status" name="status" class="form-input">
+              <option value="New" {% if message.status == 'New' %}selected{% endif %}>New</option>
+              <option value="Replied" {% if message.status == 'Replied' %}selected{% endif %}>Replied</option>
+              <option value="Closed" {% if message.status == 'Closed' %}selected{% endif %}>Closed</option>
+            </select>
+          </div>
+          {% if message.replied_at %}
+          <p class="text-muted">Last replied at {{ message.replied_at.strftime('%Y-%m-%d %H:%M') }}</p>
+          {% endif %}
+          <button type="submit" class="btn btn-primary">Save Response</button>
+        </form>
+      </div>
+    </div>
+  </div>
+</section>
+{% endblock %}
+

@@ -1,0 +1,144 @@
+{% extends "layout.html" %} {% block title %}Shopping Cart - Football Store{%
+endblock %} {% block content %}
+<section class="page-header">
+  <div class="container">
+    <h1>Shopping Cart</h1>
+  </div>
+</section>
+
+<section class="section">
+  <div class="container">
+    {% if cart %}
+    <div class="cart-layout">
+      <div class="cart-items">
+        {% for key, item in cart.items() %}
+        <div class="cart-item">
+          <img
+            src="{{ item.image }}"
+            alt="{{ item.name }}"
+            class="cart-item-image"
+          />
+          <div class="cart-item-details">
+            <h3>{{ item.name }}</h3>
+            <p class="cart-item-type">{{ item.type|title }}</p>
+            <p class="cart-item-price price-amount"
+               data-price-base="{{ item.price }}"
+               data-price-currency="{{ item.currency_code or base_currency.code }}">
+              {{ format_currency_price(item.price, None, item.currency_code) }}
+            </p>
+          </div>
+          <div class="cart-item-quantity">
+            <button
+              onclick="updateQuantity('{{ key }}', {{ item.quantity - 1 }})"
+            >
+              -
+            </button>
+            <input type="number" value="{{ item.quantity }}" min="1" readonly />
+            <button
+              onclick="updateQuantity('{{ key }}', {{ item.quantity + 1 }})"
+            >
+              +
+            </button>
+          </div>
+          <div class="cart-item-total price-amount"
+               data-price-base="{{ (item.price * item.quantity)|float }}"
+               data-price-currency="{{ item.currency_code or base_currency.code }}">
+            {{ format_currency_price(item.price * item.quantity, None, item.currency_code) }}
+          </div>
+          <a
+            href="{{ url_for('remove_from_cart', cart_key=key) }}"
+            class="cart-item-remove"
+          >
+            <i class="fas fa-trash"></i>
+          </a>
+        </div>
+        {% endfor %}
+      </div>
+
+      <div class="cart-summary">
+        <h3>Order Summary</h3>
+        <div class="summary-row">
+          <span>Subtotal</span>
+          <span id="subtotal"
+                class="price-amount"
+                data-price-base="{{ subtotal_base }}"
+                data-price-currency="{{ base_currency.code }}">
+            {{ subtotal_formatted }}
+          </span>
+        </div>
+        {% if coupon and discount_base > 0 %}
+        <div class="summary-row" style="color: #28a745;">
+          <span>Discount ({{ coupon.code }})</span>
+          <span class="price-amount"
+                data-price-base="{{ discount_base }}"
+                data-price-currency="{{ base_currency.code }}"
+                data-price-negative="true">
+            -{{ discount_formatted }}
+          </span>
+        </div>
+        {% endif %}
+        <div class="summary-row">
+          <span>Shipping</span>
+          <span class="price-amount"
+                data-price-base="{{ shipping_base }}"
+                data-price-currency="{{ base_currency.code }}">
+            {{ shipping_formatted }}
+          </span>
+        </div>
+        <div class="summary-row">
+          <span>Tax ({{ (tax_rate * 100)|round(0) }}%)</span>
+          <span class="price-amount"
+                data-price-base="{{ tax_base }}"
+                data-price-currency="{{ base_currency.code }}">
+            {{ tax_formatted }}
+          </span>
+        </div>
+        <div class="summary-total">
+          <span>Total</span>
+          <span id="total"
+                class="price-amount"
+                data-price-base="{{ total_base }}"
+                data-price-currency="{{ base_currency.code }}">
+            {{ total_formatted }}
+          </span>
+        </div>
+        <a href="{{ url_for('checkout') }}" class="btn btn-primary btn-block">
+          Proceed to Checkout
+        </a>
+        <a href="{{ url_for('products') }}" class="btn btn-outline btn-block">
+          Continue Shopping
+        </a>
+      </div>
+    </div>
+    {% else %}
+    <div class="empty-state">
+      <i class="fas fa-shopping-cart"></i>
+      <h3>Your cart is empty</h3>
+      <p>Add some items to get started!</p>
+      <a href="{{ url_for('products') }}" class="btn btn-primary">Shop Now</a>
+    </div>
+    {% endif %}
+  </div>
+</section>
+{% endblock %} {% block scripts %}
+<script>
+  function updateQuantity(cartKey, newQuantity) {
+    if (newQuantity < 1) return;
+
+    fetch("/update-cart", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        cart_key: cartKey,
+        quantity: newQuantity,
+      }),
+    })
+      .then((response) => response.json())
+      .then((data) => {
+        if (data.success) {
+          location.reload();
+        }
+      });
+  }
+</script>
+{% endblock %}

@@ -1,0 +1,306 @@
+{% extends "layout.html" %}
+{% block title %}Currencies - Admin{% endblock %}
+
+{% block content %}
+<section class="page-header">
+    <div class="container">
+        <h1>Currency Management</h1>
+        <p>Manage currencies and exchange rates for the store.</p>
+        <a href="{{ url_for('admin') }}" class="btn btn-secondary" style="margin-top: 15px;">
+            <i class="fas fa-arrow-left"></i> Back to Admin
+        </a>
+    </div>
+</section>
+
+<section class="section">
+    <div class="container">
+        <div class="admin-section">
+            <div class="admin-section-header">
+                <h2>Available Currencies</h2>
+                <button class="btn btn-primary" onclick="showAddCurrencyModal()">
+                    <i class="fas fa-plus"></i> Add Currency
+                </button>
+            </div>
+
+            <div class="table-responsive">
+                <table class="admin-table">
+                    <thead>
+                        <tr>
+                            <th>Currency</th>
+                            <th>Code</th>
+                            <th>Symbol</th>
+                            <th>Exchange Rate</th>
+                            <th>Base</th>
+                            <th>Status</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for currency in currencies %}
+                        <tr>
+                            <td>{{ currency.name }}</td>
+                            <td><strong>{{ currency.code }}</strong></td>
+                            <td>{{ currency.symbol }}</td>
+                            <td>{{ "%.6f"|format(currency.exchange_rate) }}</td>
+                            <td>
+                                {% if currency.is_base %}
+                                <span class="status-badge status-active">Base</span>
+                                {% else %}
+                                <span class="text-muted">-</span>
+                                {% endif %}
+                            </td>
+                            <td>
+                                <span class="status-badge status-{{ 'active' if currency.is_active else 'inactive' }}">
+                                    {{ 'Active' if currency.is_active else 'Inactive' }}
+                                </span>
+                            </td>
+                            <td>
+                                <div class="action-buttons">
+                                    <button class="btn btn-secondary btn-sm" onclick="editCurrency({{ currency.currency_id }})">
+                                        <i class="fas fa-edit"></i> Edit
+                                    </button>
+                                    {% if not currency.is_base %}
+                                    <form method="POST" action="{{ url_for('currency.set_base_currency', currency_id=currency.currency_id) }}" style="display:inline;">
+                                        <button type="submit" class="btn btn-primary btn-sm">
+                                            <i class="fas fa-star"></i> Set Base
+                                        </button>
+                                    </form>
+                                    {% endif %}
+                                </div>
+                            </td>
+                        </tr>
+                        {% else %}
+                        <tr>
+                            <td colspan="7" class="text-center">
+                                <p class="text-muted">No currencies found. Add your first currency!</p>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="currency-info-box" style="margin-top: 30px; padding: 20px; background: #f8f9fa; border-radius: 10px;">
+                <h3><i class="fas fa-info-circle"></i> Currency Information</h3>
+                <p><strong>Base Currency:</strong> {{ base_currency.name if base_currency else 'EGP' }} ({{ base_currency.code if base_currency else 'EGP' }})</p>
+                <p><strong>Symbol:</strong> {{ base_currency.symbol if base_currency else 'EGP' }}</p>
+                <p><strong>Exchange Rate:</strong> 1.000000 (base rate)</p>
+                <p class="text-muted" style="margin-top: 15px;">
+                    <i class="fas fa-exclamation-triangle"></i>
+                    All products and orders are stored in base currency (EGP). Exchange rates are used for display purposes only.
+                </p>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Add/Edit Currency Modal -->
+<div id="currencyModal" class="modal">
+    <div class="modal-content">
+        <span class="modal-close" onclick="closeCurrencyModal()">&times;</span>
+        <h2 id="modalTitle">Add Currency</h2>
+        <form id="currencyForm" method="POST">
+            <input type="hidden" id="currency_id" name="currency_id" />
+            
+            <div class="form-group">
+                <label for="name">Currency Name *</label>
+                <input type="text" id="name" name="name" required class="form-input" 
+                       placeholder="e.g., US Dollar" />
+            </div>
+            
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="code">Currency Code *</label>
+                    <input type="text" id="code" name="code" required class="form-input" 
+                           placeholder="USD" maxlength="3" pattern="[A-Za-z]{3}" />
+                </div>
+                <div class="form-group">
+                    <label for="symbol">Symbol *</label>
+                    <input type="text" id="symbol" name="symbol" required class="form-input" 
+                           placeholder="$" maxlength="10" />
+                </div>
+            </div>
+            
+            <div class="form-group">
+                <label for="exchange_rate">Exchange Rate (to base) *</label>
+                <input type="number" id="exchange_rate" name="exchange_rate" required class="form-input" 
+                       step="0.000001" min="0.000001" placeholder="0.032000" />
+                <small class="text-muted">How many units of this currency = 1 unit of base currency (EGP)</small>
+            </div>
+            
+            <div class="form-group">
+                <label>
+                    <input type="checkbox" id="is_active" name="is_active" checked />
+                    Active (visible to users)
+                </label>
+            </div>
+            
+            <div class="form-group">
+                <label>
+                    <input type="checkbox" id="is_base" name="is_base" />
+                    Set as Base Currency
+                </label>
+            </div>
+            
+            <div class="form-actions">
+                <button type="submit" class="btn btn-primary">
+                    <i class="fas fa-save"></i> Save Currency
+                </button>
+                <button type="button" class="btn btn-secondary" onclick="closeCurrencyModal()">
+                    Cancel
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+let isEditMode = false;
+
+function showAddCurrencyModal() {
+    isEditMode = false;
+    document.getElementById('modalTitle').textContent = 'Add Currency';
+    document.getElementById('currencyForm').reset();
+    document.getElementById('currency_id').value = '';
+    document.getElementById('is_active').checked = true;
+    document.getElementById('is_base').checked = false;
+    document.getElementById('currencyModal').style.display = 'flex';
+}
+
+function editCurrency(currencyId) {
+    isEditMode = true;
+    document.getElementById('modalTitle').textContent = 'Edit Currency';
+    
+    // Find currency in the list
+    const currencies = {{ currencies|tojson }};
+    const currency = currencies.find(c => c.currency_id === currencyId);
+    
+    if (currency) {
+        document.getElementById('currency_id').value = currency.currency_id;
+        document.getElementById('name').value = currency.name;
+        document.getElementById('code').value = currency.code;
+        document.getElementById('symbol').value = currency.symbol;
+        document.getElementById('exchange_rate').value = currency.exchange_rate;
+        document.getElementById('is_active').checked = currency.is_active;
+        document.getElementById('is_base').checked = currency.is_base;
+        document.getElementById('code').readOnly = true; // Code cannot be changed
+    }
+    
+    document.getElementById('currencyModal').style.display = 'flex';
+}
+
+function closeCurrencyModal() {
+    document.getElementById('currencyModal').style.display = 'none';
+    document.getElementById('code').readOnly = false;
+}
+
+// Form submission
+document.getElementById('currencyForm').addEventListener('submit', function(e) {
+    e.preventDefault();
+    
+    const currencyId = document.getElementById('currency_id').value;
+    let url, method;
+    
+    if (currencyId) {
+        // Edit existing currency
+        url = '/admin/currencies/edit/' + currencyId;
+        method = 'POST';
+    } else {
+        // Add new currency
+        url = '/admin/currencies/add';
+        method = 'POST';
+    }
+    
+    const form = document.getElementById('currencyForm');
+    const formData = new FormData(form);
+    
+    // Get checkbox values properly
+    formData.set('is_active', document.getElementById('is_active').checked ? 'on' : '');
+    formData.set('is_base', document.getElementById('is_base').checked ? 'on' : '');
+    
+    fetch(url, {
+        method: method,
+        body: formData
+    })
+    .then(response => {
+        if (response.redirected) {
+            // Server redirected, reload page
+            window.location.href = response.url;
+        } else {
+            return response.json();
+        }
+    })
+    .then(data => {
+        if (data && data.success) {
+            showNotification(data.message || 'Currency saved successfully!', 'success');
+            closeCurrencyModal();
+            setTimeout(() => location.reload(), 1000);
+        } else if (data && !data.success) {
+            showNotification(data.message || 'Failed to save currency', 'error');
+        }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        showNotification('An error occurred. Please try again.', 'error');
+    });
+});
+
+// Auto-uppercase currency code
+document.getElementById('code').addEventListener('input', function(e) {
+    this.value = this.value.toUpperCase();
+});
+
+// Close modal on outside click
+window.onclick = function(event) {
+    if (event.target.classList.contains('modal')) {
+        closeCurrencyModal();
+    }
+};
+</script>
+
+<style>
+.currency-info-box {
+    background: #f8f9fa;
+    border-radius: 10px;
+    padding: 20px;
+}
+
+.currency-info-box h3 {
+    margin-bottom: 15px;
+    color: var(--cetacean-blue);
+}
+
+.currency-info-box p {
+    margin: 8px 0;
+}
+
+.action-buttons {
+    display: flex;
+    gap: 10px;
+}
+
+.form-actions {
+    display: flex;
+    gap: 15px;
+    margin-top: 20px;
+}
+
+.form-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;
+}
+
+@media (max-width: 768px) {
+    .form-row {
+        grid-template-columns: 1fr;
+    }
+    
+    .action-buttons {
+        flex-direction: column;
+    }
+}
+</style>
+{% endblock %}

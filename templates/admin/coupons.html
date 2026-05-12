@@ -1,0 +1,210 @@
+{% extends "layout.html" %}
+{% block title %}Coupon Manager - Admin{% endblock %}
+
+{% block content %}
+<section class="page-header">
+  <div class="container">
+    <h1>Coupon Manager</h1>
+    <p>Create and manage discount coupons.</p>
+  </div>
+</section>
+
+<section class="section">
+  <div class="container">
+    <div class="admin-section">
+      <div class="admin-section-header">
+        <h2>Coupons</h2>
+        <button class="btn btn-primary" onclick="showAddCouponModal()">
+          <i class="fas fa-plus"></i> Add New Coupon
+        </button>
+      </div>
+      <div class="table-responsive">
+        <table class="admin-table">
+          <thead>
+            <tr>
+              <th>Code</th>
+              <th>Type</th>
+              <th>Value</th>
+              <th>Min Order</th>
+              <th>Usage Limit</th>
+              <th>Times Used</th>
+              <th>Expires</th>
+              <th>Status</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for coupon in coupons %}
+            <tr>
+              <td><strong>{{ coupon.code }}</strong></td>
+              <td>{{ coupon.discount_type|title }}</td>
+              <td>
+                {% if coupon.discount_type == 'percentage' %}
+                  {{ coupon.discount_value }}%
+                {% else %}
+                  ${{ "%.2f"|format(coupon.discount_value) }}
+                {% endif %}
+              </td>
+              <td>
+                {% if coupon.min_order_amount %}
+                  ${{ "%.2f"|format(coupon.min_order_amount) }}
+                {% else %}
+                  —
+                {% endif %}
+              </td>
+              <td>
+                {% if coupon.usage_limit %}
+                  {{ coupon.usage_limit }}
+                {% else %}
+                  Unlimited
+                {% endif %}
+              </td>
+              <td>{{ coupon.times_used or 0 }}</td>
+              <td>
+                {% if coupon.expires_at %}
+                  {% set exp_date = coupon.expires_at %}
+                  {% if exp_date is string %}
+                    {{ exp_date[:16] if exp_date|length > 16 else exp_date }}
+                  {% else %}
+                    {{ exp_date.strftime('%Y-%m-%d %H:%M') }}
+                  {% endif %}
+                {% else %}
+                  Never
+                {% endif %}
+              </td>
+              <td>
+                <span class="status-badge status-{{ 'active' if coupon.is_active else 'inactive' }}">
+                  {{ 'Active' if coupon.is_active else 'Inactive' }}
+                </span>
+              </td>
+              <td>
+                <button class="btn btn-secondary btn-sm" onclick="editCoupon({{ coupon.coupon_id }})">
+                  Edit
+                </button>
+              </td>
+            </tr>
+            {% else %}
+            <tr>
+              <td colspan="9">No coupons found. Create your first coupon!</td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Add/Edit Coupon Modal -->
+<div id="couponModal" class="modal">
+  <div class="modal-content">
+    <span class="modal-close" onclick="closeCouponModal()">&times;</span>
+    <h2 id="modalTitle">Add New Coupon</h2>
+    <form id="couponForm">
+      <input type="hidden" id="coupon_id" name="coupon_id" />
+      <div class="form-group">
+        <label for="code">Coupon Code *</label>
+        <input type="text" id="code" name="code" required class="form-input" placeholder="SAVE10" />
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label for="discount_type">Discount Type *</label>
+          <select id="discount_type" name="discount_type" required class="form-input">
+            <option value="percentage">Percentage</option>
+            <option value="fixed">Fixed Amount</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label for="discount_value">Discount Value *</label>
+          <input type="number" id="discount_value" name="discount_value" step="0.01" required class="form-input" placeholder="10" />
+        </div>
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label for="min_order_amount">Minimum Order Amount</label>
+          <input type="number" id="min_order_amount" name="min_order_amount" step="0.01" class="form-input" placeholder="Optional" />
+        </div>
+        <div class="form-group">
+          <label for="usage_limit">Usage Limit</label>
+          <input type="number" id="usage_limit" name="usage_limit" class="form-input" placeholder="Optional" />
+        </div>
+      </div>
+      <div class="form-group">
+        <label for="expires_at">Expiration Date & Time</label>
+        <input type="datetime-local" id="expires_at" name="expires_at" class="form-input" />
+      </div>
+      <div class="form-group">
+        <label>
+          <input type="checkbox" id="is_active" name="is_active" checked />
+          Active
+        </label>
+      </div>
+      <button type="button" class="btn btn-primary btn-block" onclick="submitCoupon()">
+        Save Coupon
+      </button>
+    </form>
+  </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+  function showAddCouponModal() {
+    document.getElementById('modalTitle').textContent = 'Add New Coupon';
+    document.getElementById('couponForm').reset();
+    document.getElementById('coupon_id').value = '';
+    document.getElementById('is_active').checked = true;
+    document.getElementById('couponModal').style.display = 'flex';
+  }
+
+  function closeCouponModal() {
+    document.getElementById('couponModal').style.display = 'none';
+  }
+
+  function editCoupon(couponId) {
+    // For now, just show the modal - in a full implementation, you'd fetch the coupon data
+    alert('Edit functionality - Fetch coupon data for ID: ' + couponId);
+    showAddCouponModal();
+  }
+
+  function submitCoupon() {
+    const form = document.getElementById('couponForm');
+    if (!form.checkValidity()) {
+      form.reportValidity();
+      return;
+    }
+
+    const formData = new FormData(form);
+    const couponId = document.getElementById('coupon_id').value;
+    const url = couponId ? `/admin/coupons/${couponId}` : '/admin/coupons';
+    const method = couponId ? 'POST' : 'POST';
+
+    fetch(url, {
+      method: method,
+      body: formData,
+    })
+      .then((response) => response.json())
+      .then((data) => {
+        if (data.success) {
+          alert(data.message || 'Coupon saved successfully!');
+          closeCouponModal();
+          location.reload();
+        } else {
+          alert('Error: ' + (data.message || 'Failed to save coupon'));
+        }
+      })
+      .catch((error) => {
+        alert('Error: ' + error.message);
+      });
+  }
+
+  // Close modal when clicking outside
+  window.onclick = function (event) {
+    const modal = document.getElementById('couponModal');
+    if (event.target === modal) {
+      closeCouponModal();
+    }
+  };
+</script>
+{% endblock %}
+
