@@ -3,13 +3,23 @@
 <img src="https://img.shields.io/badge/Python-3.11+-3776AB?style=for-the-badge&logo=python&logoColor=white" />
 <img src="https://img.shields.io/badge/Flask-3.x-000000?style=for-the-badge&logo=flask&logoColor=white" />
 <img src="https://img.shields.io/badge/SQL_Server-2022-CC2927?style=for-the-badge&logo=microsoftsqlserver&logoColor=white" />
-<img src="https://img.shields.io/badge/License-MIT-green?style=for-the-badge" />
+<img src="https://img.shields.io/badge/License-MIT-22c55e?style=for-the-badge" />
+
+<br>
+<br>
 
 # ⚽ Football Store
 
-**Full-stack e-commerce platform for football merchandise and match tickets**
+### Full-Stack E-Commerce Platform for Football Merchandise & Match Tickets
 
-[Features](#features) · [Tech Stack](#tech-stack) · [Getting Started](#getting-started) · [Project Structure](#project-structure) · [API Reference](#api-reference) · [Contributing](#contributing)
+*A modern web application for browsing football products, managing orders, and purchasing match tickets.*
+
+<br>
+
+[![Features](https://img.shields.io/badge/Explore-Features-2563eb?style=flat-square)](#features)
+[![Tech Stack](https://img.shields.io/badge/View-Tech%20Stack-7c3aed?style=flat-square)](#tech-stack)
+[![Getting Started](https://img.shields.io/badge/Setup-Getting%20Started-16a34a?style=flat-square)](#getting-started)
+[![API](https://img.shields.io/badge/API-Reference-f97316?style=flat-square)](#api-reference)
 
 </div>
 
